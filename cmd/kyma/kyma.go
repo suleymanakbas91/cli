@@ -1,19 +1,14 @@
 package kyma
 
 import (
+	alphaInstall "github.com/kyma-project/cli/cmd/kyma/alpha/install"
+	alphaUninstall "github.com/kyma-project/cli/cmd/kyma/alpha/uninstall"
 	"github.com/kyma-project/cli/cmd/kyma/apply"
 	"github.com/kyma-project/cli/cmd/kyma/completion"
 	"github.com/kyma-project/cli/cmd/kyma/console"
 	"github.com/kyma-project/cli/cmd/kyma/create"
 	initial "github.com/kyma-project/cli/cmd/kyma/init"
 	"github.com/kyma-project/cli/cmd/kyma/install"
-	"github.com/kyma-project/cli/cmd/kyma/provision/aks"
-	"github.com/kyma-project/cli/cmd/kyma/provision/gardener"
-	"github.com/kyma-project/cli/cmd/kyma/provision/gardener/aws"
-	"github.com/kyma-project/cli/cmd/kyma/provision/gardener/az"
-	"github.com/kyma-project/cli/cmd/kyma/provision/gardener/gcp"
-	"github.com/kyma-project/cli/cmd/kyma/provision/gke"
-	"github.com/kyma-project/cli/cmd/kyma/provision/minikube"
 	"github.com/kyma-project/cli/cmd/kyma/test"
 	"github.com/kyma-project/cli/cmd/kyma/test/definitions"
 	del "github.com/kyma-project/cli/cmd/kyma/test/delete"
@@ -23,7 +18,7 @@ import (
 	"github.com/kyma-project/cli/cmd/kyma/test/status"
 	"github.com/kyma-project/cli/cmd/kyma/version"
 
-	"github.com/kyma-project/cli/cmd/kyma/provision"
+	"github.com/kyma-project/cli/cmd/kyma/alpha"
 	"github.com/kyma-project/cli/cmd/kyma/upgrade"
 	"github.com/kyma-project/cli/internal/cli"
 	"github.com/spf13/cobra"
@@ -50,21 +45,15 @@ Kyma CLI allows you to install, test, and manage Kyma.
 	cmd.PersistentFlags().StringVar(&o.KubeconfigPath, "kubeconfig", "", `Specifies the path to the kubeconfig file. By default, Kyma CLI uses the KUBECONFIG environment variable or "/$HOME/.kube/config" if the variable is not set.`)
 	cmd.PersistentFlags().BoolP("help", "h", false, "Displays help for the command.")
 
-	provisionCmd := provision.NewCmd()
-	provisionCmd.AddCommand(minikube.NewCmd(minikube.NewOptions(o)))
-	provisionCmd.AddCommand(gke.NewCmd(gke.NewOptions(o)))
-	provisionCmd.AddCommand(aks.NewCmd(aks.NewOptions(o)))
-	gardenerCmd := gardener.NewCmd()
-	gardenerCmd.AddCommand(gcp.NewCmd(gcp.NewOptions(o)))
-	gardenerCmd.AddCommand(az.NewCmd(az.NewOptions(o)))
-	gardenerCmd.AddCommand(aws.NewCmd(aws.NewOptions(o)))
-	provisionCmd.AddCommand(gardenerCmd)
+	alphaCmd := alpha.NewCmd()
+	alphaCmd.AddCommand(alphaInstall.NewCmd(alphaInstall.NewOptions(o)))
+	alphaCmd.AddCommand(alphaUninstall.NewCmd(alphaUninstall.NewOptions(o)))
 
 	cmd.AddCommand(
 		version.NewCmd(version.NewOptions(o)),
 		completion.NewCmd(),
 		install.NewCmd(install.NewOptions(o)),
-		provisionCmd,
+		alphaCmd,
 		console.NewCmd(console.NewOptions(o)),
 		upgrade.NewCmd(upgrade.NewOptions(o)),
 		create.NewCmd(o),
